@@ -1,0 +1,169 @@
+ 10 Viva Questions Per Program
+🔹 Program 1: MapReduce - Counting Records
+What are the roles of the Mapper and Reducer in your program?
+
+What data type does the Mapper output?
+
+What is the key-value pair emitted by the Mapper?
+
+What is the role of the job.setJarByClass() method?
+
+How do you specify input and output paths in your code?
+
+What happens if the output directory already exists?
+
+What does waitForCompletion(true) do?
+
+Can you write this program in Python using Hadoop streaming?
+
+What does the Reducer do with the values?
+
+What would be the output if your dataset was empty?
+
+🔹 Program 2: MapReduce - Maximum Temperature
+How do you extract the year and temperature from each line?
+
+How do you handle missing or corrupt temperature values?
+
+Why use Text and IntWritable instead of String and int?
+
+What would be the key and value output from the Mapper?
+
+How does the Reducer find the max temperature?
+
+How can you optimize this program for large datasets?
+
+What happens if multiple years have the same max temperature?
+
+Can you modify this to find both max and min temperature?
+
+How is Combiner used in such scenarios?
+
+What is the difference between local and HDFS paths?
+
+🔹 Program 3: Pig - MovieLens Dataset
+(You can group questions for a–e together)
+
+What is the structure of the MovieLens dataset?
+
+How do you load the data into Pig?
+
+What is the difference between GROUP BY and JOIN?
+
+How do you filter users who rated a movie > 3?
+
+How is FOREACH ... GENERATE used in Pig?
+
+How do you calculate average rating for each movie?
+
+What is a relation in Pig?
+
+What are bags in Pig Latin?
+
+What is the role of DESCRIBE and DUMP?
+
+How do you store the output to HDFS?
+
+🔹 Program 4: Advanced Pig Concepts - Weather Dataset
+What does grouping by year achieve in Pig?
+
+How do you create a bag for grouped data?
+
+What function is used to find max or avg temperature?
+
+How do you filter for a specific state in Pig?
+
+How do you process 3 years’ worth of data?
+
+What data type is used for temperature values?
+
+What is a FLATTEN() in Pig and when is it used?
+
+How do you limit or order Pig results?
+
+How do you write a UDF in Pig?
+
+What’s the difference between DUMP and STORE?
+
+🔹 Program 5: Hive - MovieLens Facts Extraction
+What are Hive tables: managed vs external?
+
+What is CASE statement and how is it used?
+
+How do you filter NULL values in Hive?
+
+How do you select only specific activity types?
+
+How do you convert ‘Y’/’N’ to 1/0 in Hive?
+
+How can you limit output to 25 rows?
+
+What is the difference between WHERE and HAVING?
+
+How do you sort data in Hive?
+
+How is schema-on-read used in Hive?
+
+How do you create a partitioned table in Hive?
+
+
+✅ Program 1 – MapReduce (Counting Records)
+1- Java Mapper emits <Text("count"), IntWritable(1)>, Reducer sums values.
+2- Mapper outputs key: Text, value: IntWritable.
+3- ("count", 1) for every input line.
+4- Specifies the class with the main method for the job jar.
+5- With FileInputFormat and FileOutputFormat methods.
+6- Job fails unless /output is deleted.
+7- Submits job and waits; true enables progress logging.
+8- Yes, using Hadoop Streaming with Python scripts.
+9- Sums up all the 1s to return total line count.
+10- Output will still be count 0.
+
+✅ Program 2 – MapReduce (Max Temperature)
+1- Use substring() or regex to extract year and temperature.
+2- Use if checks to ignore null or extreme values (e.g., -9999).
+3- Hadoop uses Writable types for serialization.
+4- Key: year, Value: temperature.
+5- Loops through all values, keeps max in int maxTemp.
+6- Use Combiner, compress intermediate outputs.
+7- It will still return one of them (non-deterministic if same).
+8- Add extra logic to track both min and max.
+9- Yes, Combiner can be used to reduce mapper output size.
+10- Local uses file:///, HDFS uses hdfs:///.
+
+✅ Program 3 – Pig Script (MovieLens Ratings)
+1- Rows with userId, movieId, rating, timestamp.
+2- LOAD 'file' USING PigStorage(',') AS (...)
+3- GROUP BY is for aggregation; JOIN combines tables.
+4- FILTER data BY rating > 3.
+5- Used to project fields: FOREACH ... GENERATE movieId, COUNT(...).
+6- Use GROUP BY movieId, then AVG(rating) inside FOREACH.
+7- A relation is a dataset, like a table.
+8- Bag is a collection of tuples (grouped data).
+9- DESCRIBE shows schema, DUMP shows output in terminal.
+10- Use STORE result INTO 'output_path' USING PigStorage(',');
+
+✅ Program 4 – Advanced Pig Concepts
+1- Allows aggregation per year.
+2- Done automatically by GROUP BY year.
+3- Use MAX(temp) or AVG(temp) inside FOREACH.
+4- Use FILTER data BY state == 'XY'.
+5- Use FILTER for 3 specific years using IN or OR.
+6- Usually float or int depending on dataset.
+7- FLATTEN() removes nesting, useful after grouping.
+8- Use LIMIT and ORDER BY clauses.
+9- Write a Java or Python UDF and register using REGISTER.
+10- DUMP shows immediately, STORE saves to HDFS.
+
+✅ Program 5 – Hive (Extract Facts)
+1- Managed table: Hive controls data; External: Hive stores schema only.
+2- CASE WHEN recommended = 'Y' THEN 1 ELSE 0 END AS recommended_int.
+3- WHERE genreid IS NOT NULL.
+4- Use WHERE activity IN (...) with correct states.
+5- Use CASE WHEN to convert Y/N to 1/0.
+6- Add LIMIT 25 at end of query.
+7- WHERE filters rows before grouping, HAVING after.
+8- ORDER BY column ASC/DESC.
+9- Hive applies schema at query time (not while storing).
+10- PARTITIONED BY (year STRING) in CREATE TABLE statement.
+
