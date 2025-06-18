@@ -1,0 +1,89 @@
+(a)
+ratings = LOAD 'dataset3.csv' 
+         USING PigStorage(',') 
+         AS (movieId:int, title:chararray, userId:int, rating:float, genreId:int);
+
+-- Group by both movieId and title
+grouped_ratings = GROUP ratings BY (movieId, title);
+
+-- Count number of ratings for each movie
+movie_rating_count = FOREACH grouped_ratings 
+                     GENERATE group.movieId AS movieId, 
+                              group.title AS title, 
+                              COUNT(ratings) AS numRatings;
+
+DUMP movie_rating_count;
+
+(b)
+ratings = LOAD 'dataset3.csv' 
+         USING PigStorage(',') 
+         AS (movieId:int, title:chararray, userId:int, rating:float, genreId:int);
+
+grouped_by_movie = GROUP ratings BY (movieId, title);
+
+user_rating_info = FOREACH grouped_by_movie {
+    user_ids = FOREACH ratings GENERATE userId;
+    GENERATE group.title AS title, 
+             group.movieId AS movieId, 
+             user_ids AS users, 
+             COUNT(user_ids) AS numRatings;
+};
+
+DUMP user_rating_info;
+(c)
+ratings = LOAD 'dataset3.csv' 
+         USING PigStorage(',') 
+         AS (movieId:int, title:chararray, userId:int, rating:float, genreId:int);
+
+grouped_by_user = GROUP ratings BY userId;
+
+user_movie_info = FOREACH grouped_by_user {
+    movie_ids = FOREACH ratings GENERATE movieId;
+    GENERATE group AS userId, 
+             movie_ids AS ratedMovies, 
+             COUNT(ratings) AS totalRatings;
+};
+
+DUMP user_movie_info;
+
+(d)
+ratings = LOAD 'dataset3.csv' 
+         USING PigStorage(',') 
+         AS (movieId:int, title:chararray, userId:int, rating:float, genreId:int);
+
+-- Step 1: Filter ratings > 3
+high_rating = FILTER ratings BY rating > 3;
+
+-- Step 2: Project only movieId and title to identify unique movies
+movies_only = FOREACH high_rating GENERATE movieId, title;
+
+-- Step 3: Remove duplicate movies (distinct)
+unique_movies = DISTINCT movies_only;
+
+-- Step 4: Count distinct movies
+grouped_all = GROUP unique_movies ALL;
+movie_count = FOREACH grouped_all GENERATE COUNT(unique_movies) AS numHighRatedMovies;
+
+list = FOREACH high_ratings 
+                  GENERATE title AS movieTitle, movieId AS movieId, rating;
+
+DUMP movie_count;
+DUMP list;7
+
+
+(e)
+ratings = LOAD 'dataset3.csv' 
+         USING PigStorage(',') 
+         AS (movieId:int, title:chararray, userId:int, rating:float, genreId:int);
+
+grouped_by_movie = GROUP ratings BY (movieId, title);
+
+movie_stats = FOREACH grouped_by_movie 
+              GENERATE group.title AS movieTitle, 
+                       group.movieId AS movieId, 
+                       MAX(ratings.rating) AS maxRating, 
+                       AVG(ratings.rating) AS avgRating, 
+                       MIN(ratings.rating) AS minRating;
+
+DUMP movie_stats;
+
